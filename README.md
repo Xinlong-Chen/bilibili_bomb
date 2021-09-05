@@ -17,9 +17,11 @@ B站直播的Web页发送弹幕具有时间限制，不能快速的发送弹幕�
 运行结果：
 
 控制台：
+
 ![控制台结果](Image/img_exec.png)
 
 实际发送弹幕结果：下面的“这回真捡到jk妹妹了就是复读的结果”
+
 ![弹幕结果](Image/img_result.png)
 
 
@@ -54,52 +56,52 @@ python Bilibili_Live_Spider https://live.bilibili.com/21452505
     通过`browsercookie`插件获取浏览器的所有cookie，然后找寻和B站直播相关的cookie，这样就无须抓包去找cookie了。
     但是需要保证浏览器端已经登陆了B站！
 
-  如下程序为获取cookie：
+    如下程序为获取cookie：
 
-  ```python
-  # find cookie from browser
-  cookies_jar = browsercookie.load()
-  ```
+    ```python
+    # find cookie from browser
+    cookies_jar = browsercookie.load()
+    ```
 
-  请求时使用如下格式使用上述cookie：
+    请求时使用如下格式使用上述cookie：
 
-  ```python
-  resp = requests.get(config['url'], cookies=cookies_jar, headers=headers).text
-  ```
+    ```python
+    resp = requests.get(config['url'], cookies=cookies_jar, headers=headers).text
+    ```
 
   
 
 2. 指定直播间跟随发送弹幕
 
-   url中的数字不一定为真实的直播间号，需要进行提取。
+    url中的数字不一定为真实的直播间号，需要进行提取。
 
-   ```python
-   # get room_id, and set it into config
-   get_room_id(config, cookies_jar)
-   
-   def get_room_id(config: dict, cookies_jar):
-       # get room_id from url
-       # each url have it's room_id
-       # can't use last part of url as room_id
-       headers = {
-           'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36',
-           'refer': 'https://live.bilibili.com/'
-       }
-   
-       resp = requests.get(config['url'], cookies=cookies_jar, headers=headers).text
-       if re.search(r'room_id":(.*?),', resp):
-           roomid_list = re.findall(r'room_id":(.*?),', resp)
-           for iter in roomid_list:
-               if int(iter) != 0:
-                   config['room_id'] = iter
-                   break
-       else:
-           print("该直播间不存在或主播已经下播！")
-           sys.exit(0)
-       if not config.__contains__('room_id'):
-           print("该直播间不存在或主播已经下播！")
-           sys.exit(0)
-   ```
+     ```python
+     # get room_id, and set it into config
+     get_room_id(config, cookies_jar)
+
+     def get_room_id(config: dict, cookies_jar):
+         # get room_id from url
+         # each url have it's room_id
+         # can't use last part of url as room_id
+         headers = {
+             'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36',
+             'refer': 'https://live.bilibili.com/'
+         }
+
+         resp = requests.get(config['url'], cookies=cookies_jar, headers=headers).text
+         if re.search(r'room_id":(.*?),', resp):
+             roomid_list = re.findall(r'room_id":(.*?),', resp)
+             for iter in roomid_list:
+                 if int(iter) != 0:
+                     config['room_id'] = iter
+                     break
+         else:
+             print("该直播间不存在或主播已经下播！")
+             sys.exit(0)
+         if not config.__contains__('room_id'):
+             print("该直播间不存在或主播已经下播！")
+             sys.exit(0)
+     ```
 
    发送弹幕（需要先看看别人发了啥）：
 
